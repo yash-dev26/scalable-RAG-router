@@ -1,8 +1,10 @@
 from fastapi import APIRouter
 
+from app.schemas.request import ChatRequest
+
 router = APIRouter()
 
 @router.post("/")
-async def chat():
-    return {"message": "Hello from the chat endpoint!"}
+async def chat(request: ChatRequest):
+    return {"response": "Hello from the chat endpoint!"}
 
