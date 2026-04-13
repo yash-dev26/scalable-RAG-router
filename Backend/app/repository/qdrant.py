@@ -20,12 +20,12 @@ async def store_in_qdrant(collection_name: str, data: list[dict], file_id: str, 
     )   
     return {"status": "success", "message": f"Data stored in collection '{collection_name}'.", "file_id": file_id}
 
-async def search_data(collection_name: str, query_vector: list[float], top_k: int = 5):
-    search_result = qdrant_client.search(
+def search_data(collection_name: str, query_vector: list[float], top_k: int = 5):
+    search_result = qdrant_client.query_points(
         collection_name=collection_name,
-        query_vector=query_vector,
+        query=query_vector,
         limit=top_k
-    )
+    ).points
     return search_result
 
 
