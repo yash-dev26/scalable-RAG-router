@@ -19,7 +19,7 @@ def route_after_evaluator(state: GraphState) -> str:
     if action == "llm_fallback" or attempts >= MAX_REWRITE_ATTEMPTS:
         return "llm"
 
-    # same reranking logic as the node
+    # same reranking logic as the rerank decision node
     if len(docs) <= 3:
         return "trim_docs"
 

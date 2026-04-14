@@ -19,7 +19,7 @@ from app.agent.graph.routing.ranking_router import ranking_decision_node
 from app.agent.graph.routing.postRewrite_router import route_after_single_rewrite
 
 
-def build_graph():
+def build_graph(checkpointer=None):
     graph = StateGraph(GraphState)
 
     # Nodes
@@ -79,4 +79,4 @@ def build_graph():
     graph.add_edge("generate", END)
     graph.add_edge("llm", END)
 
-    return graph.compile()
+    return graph.compile(checkpointer=checkpointer)

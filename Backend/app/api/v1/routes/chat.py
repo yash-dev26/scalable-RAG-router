@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 
 from app.schemas.request import ChatRequest
 from app.service.chatService import process_chat
@@ -6,7 +6,7 @@ from app.service.chatService import process_chat
 router = APIRouter()
 
 @router.post("/")
-async def chat(request: ChatRequest):
-    result = await process_chat(request)
-    return {"response": result}
+async def chat(payload: ChatRequest, request: Request):
+    result = await process_chat(payload, request.app.state.graph)
+    return result
 

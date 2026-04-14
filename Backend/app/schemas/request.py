@@ -6,6 +6,7 @@ class ChatRequest(BaseModel):
     user_id: str
     query: str
     file_id: Optional[str] = None
+    thread_id: Optional[str] = None
 
 
 class IngestRequest(BaseModel):
