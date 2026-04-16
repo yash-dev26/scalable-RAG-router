@@ -18,7 +18,17 @@ def _resolve_thread_id(request: ChatRequest) -> str:
 async def process_chat(request: ChatRequest, graph):
     thread_id = _resolve_thread_id(request)
 
-    semantic_hit = get_semantic_cached_response(request.query)
+    semantic_hit = get_semantic_cached_response(
+        request.query,
+        request.user_id,
+        request.file_id
+    )
+    if not semantic_hit and rewritten_query:
+        semantic_hit = get_semantic_cached_response(
+            rewritten_query,
+            request.user_id,
+            request.file_id
+    )
 
     if semantic_hit:
         return {
@@ -57,6 +67,16 @@ async def process_chat(request: ChatRequest, graph):
 
     result = graph.invoke(state, config=invoke_config) if graph else None
 
+    rewritten_query = None
+    queries = None
+
+    if isinstance(result, dict):
+        rewritten_query = result.get("rewritten_query")
+        queries = result.get("queries")
+    else:
+        rewritten_query = getattr(result, "rewritten_query", None)
+        queries = getattr(result, "queries", None)
+
     if isinstance(result, dict):
         response = result.get("response", "I could not generate a response right now.")
         confidence = result.get("confidence", None)
@@ -65,7 +85,34 @@ async def process_chat(request: ChatRequest, graph):
         confidence = getattr(result, "confidence", None)
 
     if confidence is None or confidence > 0.6:
-        set_semantic_cache(request.query, response)
+        # Always store original query (fallback baseline)
+        set_semantic_cache(
+            request.query,
+            response,
+            request.user_id,
+            request.file_id
+        )
+
+        # Store rewritten query (single)
+        if rewritten_query:
+            set_semantic_cache(
+                rewritten_query,
+                response,
+                request.user_id,
+                request.file_id
+            )
+
+        # Store multi queries
+        if queries:
+            for q in queries:
+                set_semantic_cache(
+                    q,
+                    response,
+                    request.user_id,
+                    request.file_id
+                )
+
+
         set_cached_response(
             user_id=request.user_id,
             file_id=request.file_id,

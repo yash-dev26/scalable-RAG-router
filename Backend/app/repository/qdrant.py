@@ -12,7 +12,14 @@ if config["qdrant_collection_name"] not in [collection.name for collection in qd
 else:
     print(f"Collection '{config['qdrant_collection_name']}' exists.")
 
-    
+if config["semantic_cache_collection_name"] not in [c.name for c in qdrant_client.get_collections().collections]:
+    qdrant_client.create_collection(
+        collection_name=config["semantic_cache_collection_name"],
+        vectors_config={
+            "size": 384,
+            "distance": "Cosine"
+        }
+    )  
 async def store_in_qdrant(collection_name: str, data: list[dict], file_id: str, user_id: str):
     qdrant_client.upsert(
         collection_name=collection_name,

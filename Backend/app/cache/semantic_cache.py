@@ -1,12 +1,16 @@
 import json
+import time
 import uuid
 import numpy as np
+from uuid import uuid4
 
 from app.config.redis import redis_client
 from app.ingestion.embeddings import gen_embeddings
+from app.repository.qdrant import qdrant_client
+from app.config.server import config
 
 
-SIMILARITY_THRESHOLD = 0.80  # tune later
+SIMILARITY_THRESHOLD = 0.82  # tune later
 
 
 def cosine_similarity(a, b):
@@ -15,50 +19,62 @@ def cosine_similarity(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
 
-def get_semantic_cached_response(query: str):
+from app.repository.qdrant import qdrant_client
 
+def get_semantic_cached_response(query: str, user_id: str, file_id: str | None):
     query_embedding = gen_embeddings(query)
+    current_time = int(time.time())
 
-    keys = redis_client.keys("semantic:*")
+    results = qdrant_client.query_points(
+        collection_name=config["semantic_cache_collection_name"],
+        query=query_embedding,
+        query_filter={
+            "must": [
+                {"key": "user_id", "match": {"value": user_id}},
+                {"key": "file_id", "match": {"value": file_id}},
+                {
+                "key": "expires_at",
+                "range": {"gte": current_time}
+                }
+            ]
+        },
+        limit=1
+    ).points
 
-    best_sim = 0
-    best_response = None
-    best_query = None
+    if not results:
+        return None
 
-    for key in keys:
-        raw = redis_client.get(key)
-        if not raw:
-            continue  
+    top = results[0]
 
-        data = json.loads(raw)
+    print(f"[semantic debug] sim={top.score:.3f} | cached='{top.payload.get('query')}'")
 
-        sim = cosine_similarity(query_embedding, data["embedding"])
+    if top.score > SIMILARITY_THRESHOLD:
+        print(f"[semantic cache] HIT ({top.score:.3f})")
+        return top.payload.get("response")
 
-        print(f"[semantic debug] sim={sim:.3f} | cached='{data['query']}'")
-
-        if sim > best_sim:
-            best_sim = sim
-            best_response = data["response"]
-            best_query = data["query"]
-
-    if best_sim > SIMILARITY_THRESHOLD:
-        print(f"[semantic cache] HIT (best_sim={best_sim:.3f}, matched='{best_query}')")
-        return best_response
-
-    print(f"[semantic cache] MISS (best_sim={best_sim:.3f})")
+    print(f"[semantic cache] MISS ({top.score:.3f})")
     return None
 
-def set_semantic_cache(query: str, response: str):
+
+def set_semantic_cache(query, response, user_id, file_id):
     embedding = gen_embeddings(query)
+    now = int(time.time())
+    ttl = 36000
 
-    key = f"semantic:{uuid.uuid4()}"
-
-    redis_client.set(
-        key,
-        json.dumps({
-            "query": query,
-            "embedding": embedding,
-            "response": response
-        }),
-        ex=3600
+    qdrant_client.upsert(
+        collection_name=config["semantic_cache_collection_name"],
+        points=[
+            {
+                "id": str(uuid4()),
+                "vector": embedding,
+                "payload": {
+                    "query": query,
+                    "response": response,
+                    "user_id": user_id,
+                    "file_id": file_id,
+                    "created_at": now,
+                    "expires_at": now + ttl
+                }
+            }
+        ]
     )
