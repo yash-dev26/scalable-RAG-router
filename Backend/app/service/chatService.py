@@ -23,12 +23,6 @@ async def process_chat(request: ChatRequest, graph):
         request.user_id,
         request.file_id
     )
-    if not semantic_hit and rewritten_query:
-        semantic_hit = get_semantic_cached_response(
-            rewritten_query,
-            request.user_id,
-            request.file_id
-    )
 
     if semantic_hit:
         return {

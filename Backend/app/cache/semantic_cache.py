@@ -4,7 +4,6 @@ import uuid
 import numpy as np
 from uuid import uuid4
 
-from app.config.redis import redis_client
 from app.ingestion.embeddings import gen_embeddings
 from app.repository.qdrant import qdrant_client
 from app.config.server import config
@@ -19,7 +18,6 @@ def cosine_similarity(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
 
-from app.repository.qdrant import qdrant_client
 
 def get_semantic_cached_response(query: str, user_id: str, file_id: str | None):
     query_embedding = gen_embeddings(query)

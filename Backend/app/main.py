@@ -8,6 +8,8 @@ from app.config.checkpointer import connect_to_mongodb
 from app.cache.semantic_cleanup import cleanup_semantic_cache
 import asyncio
 
+from app.repository.qdrant import ensure_collections
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     with connect_to_mongodb() as checkpointer:
@@ -15,6 +17,7 @@ async def lifespan(app: FastAPI):
         app.state.graph = build_graph(checkpointer=checkpointer)
         
         cleanup_task = asyncio.create_task(cleanup_semantic_cache())
+        ensure_collections()
 
         yield
 
