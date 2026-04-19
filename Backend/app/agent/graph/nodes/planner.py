@@ -24,7 +24,7 @@ def pre_retrieval_planner_node(state: GraphState) -> dict:
         return {"intent": "llm", "rewrite_type": "none"}
 
     if len(words) <= 3:
-        return {"intent": "rag", "rewrite_type": "multi"}
+        return {"intent": "rag", "rewrite_type": "none"}
 
     if _is_ambiguous(query):
         return {"intent": "rag", "rewrite_type": "single"}

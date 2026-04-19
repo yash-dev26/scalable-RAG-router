@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #050507;
+  color: #f0efff;
+  overflow-x: hidden;
+}
+
+html {
+  scrollbar-gutter: stable;
+}

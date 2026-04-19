@@ -12,4 +12,5 @@ class ChatRequest(BaseModel):
 class IngestRequest(BaseModel):
     file_id: str
     user_id: str
-    file_path: str          # was missing — caused AttributeError in ingestService
+    file_path: str
+    content_hash: str

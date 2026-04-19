@@ -1,7 +1,7 @@
 from app.schemas.state import GraphState
 
 
-MAX_REWRITE_ATTEMPTS = 1
+MAX_REWRITE_ATTEMPTS = 2
 
 
 def route_after_evaluator(state: GraphState) -> str:
@@ -10,13 +10,20 @@ def route_after_evaluator(state: GraphState) -> str:
     docs = state.context or []
     scores = state.scores or []
 
+    if action == "generate":
+        return "generate"
+    
     if action == "rewrite_single" and attempts < MAX_REWRITE_ATTEMPTS:
         return "rewrite_single"
 
     if action == "rewrite_multi" and attempts < MAX_REWRITE_ATTEMPTS:
         return "rewrite_multi"
 
-    if action == "llm_fallback" or attempts >= MAX_REWRITE_ATTEMPTS:
+    if action == "llm_fallback":
+        return "llm"
+
+    # Only block further rewrites when attempts are exhausted.
+    if attempts >= MAX_REWRITE_ATTEMPTS and action in {"rewrite_single", "rewrite_multi"}:
         return "llm"
 
     # same reranking logic as the rerank decision node

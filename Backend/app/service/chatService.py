@@ -1,3 +1,4 @@
+import json
 from app.schemas import response
 from app.schemas.request import ChatRequest
 from app.schemas.state import GraphState
@@ -5,6 +6,59 @@ from app.cache.response_cache import get_cached_response, set_cached_response
 from app.cache.semantic_cache import get_semantic_cached_response, set_semantic_cache
 
 from uuid import uuid4
+
+
+STREAMABLE_NODES = {
+    "pre_planner",
+    "multi_rewrite",
+    "single_rewrite",
+    "retrieve",
+    "evaluator",
+    "trim_docs",
+    "rerank",
+    "generate",
+    "llm",
+}
+
+
+NODE_DETAILS = {
+    "pre_planner": "Planning whether retrieval is needed.",
+    "multi_rewrite": "Expanding the query into multiple retrieval variants.",
+    "single_rewrite": "Rewriting the query for a targeted retrieval pass.",
+    "retrieve": "Searching the vector store for relevant context.",
+    "evaluator": "Evaluating retrieved context quality.",
+    "trim_docs": "Trimming context to fit the prompt window.",
+    "rerank": "Reranking retrieved documents.",
+    "generate": "Generating the final answer from context.",
+    "llm": "Generating the final answer without retrieval.",
+}
+
+
+def _format_sse(event_type: str, payload: dict) -> str:
+    return f"event: {event_type}\ndata: {json.dumps(payload, default=str)}\n\n"
+
+
+def _extract_event_output(event: dict):
+    data = event.get("data") or {}
+
+    if isinstance(data, dict):
+        return data.get("output") or data.get("chunk") or data.get("result") or data
+
+    return data
+
+
+def _extract_node_name(event: dict) -> str | None:
+    metadata = event.get("metadata") or {}
+    return metadata.get("langgraph_node") or event.get("name")
+
+
+def _node_detail(node_name: str, status: str) -> str:
+    base_detail = NODE_DETAILS.get(node_name, f"Executing {node_name}.")
+
+    if status == "done":
+        return base_detail
+
+    return base_detail
 
 def _resolve_thread_id(request: ChatRequest) -> str:
     if request.thread_id:
@@ -121,3 +175,182 @@ async def process_chat(request: ChatRequest, graph):
         "response": response,
         "thread_id": thread_id,
     }
+
+
+async def stream_chat_events(request: ChatRequest, graph):
+    thread_id = _resolve_thread_id(request)
+
+    yield _format_sse(
+        "status",
+        {
+            "type": "status",
+            "step": "cache",
+            "message": "Checking semantic and response caches...",
+            "thread_id": thread_id,
+        },
+    )
+
+    semantic_hit = get_semantic_cached_response(
+        request.query,
+        request.user_id,
+        request.file_id,
+    )
+
+    if semantic_hit:
+        yield _format_sse(
+            "cache_hit",
+            {
+                "type": "cache_hit",
+                "cache": "semantic",
+                "message": "Semantic cache hit.",
+                "thread_id": thread_id,
+            },
+        )
+        yield _format_sse(
+            "final",
+            {
+                "type": "final",
+                "response": semantic_hit,
+                "thread_id": thread_id,
+                "cached": "semantic",
+            },
+        )
+        return
+
+    cached_response = get_cached_response(
+        user_id=request.user_id,
+        file_id=request.file_id if request.file_id else None,
+        query=request.query,
+    )
+
+    if cached_response:
+        yield _format_sse(
+            "cache_hit",
+            {
+                "type": "cache_hit",
+                "cache": "response",
+                "message": "Response cache hit.",
+                "thread_id": thread_id,
+            },
+        )
+        yield _format_sse(
+            "final",
+            {
+                "type": "final",
+                "response": cached_response,
+                "thread_id": thread_id,
+                "cached": True,
+            },
+        )
+        return
+
+    yield _format_sse(
+        "status",
+        {
+            "type": "status",
+            "step": "graph",
+            "message": "Cache miss. Executing graph...",
+            "thread_id": thread_id,
+        },
+    )
+
+    state = GraphState(
+        user_id=request.user_id,
+        query=request.query,
+        file_id=request.file_id if request.file_id else None,
+    )
+
+    invoke_config = {
+        "configurable": {
+            "thread_id": thread_id,
+        }
+    }
+
+    response_text = None
+    confidence = None
+
+    try:
+        async for chunk in graph.astream(state, config=invoke_config, stream_mode="updates", version="v2"):
+            if not isinstance(chunk, dict):
+                continue
+
+            updates = chunk.get("data") if chunk.get("type") == "updates" else chunk
+            if not isinstance(updates, dict):
+                continue
+
+            for node_name, output in updates.items():
+                if node_name not in STREAMABLE_NODES:
+                    continue
+
+                yield _format_sse(
+                    "node",
+                    {
+                        "type": "node",
+                        "node": node_name,
+                        "status": "running",
+                        "detail": _node_detail(node_name, "running"),
+                    },
+                )
+
+                if isinstance(output, dict):
+                    if output.get("response"):
+                        response_text = output.get("response")
+                    if output.get("confidence") is not None:
+                        confidence = output.get("confidence")
+                    if output.get("rewritten_query"):
+                        yield _format_sse(
+                            "status",
+                            {
+                                "type": "status",
+                                "step": "rewrite",
+                                "message": f"Rewritten query: {output.get('rewritten_query')}",
+                                "thread_id": thread_id,
+                            },
+                        )
+
+                yield _format_sse(
+                    "node",
+                    {
+                        "type": "node",
+                        "node": node_name,
+                        "status": "done",
+                        "detail": _node_detail(node_name, "done"),
+                    },
+                )
+
+        if response_text is None:
+            response_text = "I could not generate a response right now."
+
+        if confidence is None or confidence > 0.6:
+            set_semantic_cache(
+                request.query,
+                response_text,
+                request.user_id,
+                request.file_id,
+            )
+
+            set_cached_response(
+                user_id=request.user_id,
+                file_id=request.file_id,
+                query=request.query,
+                response=response_text,
+            )
+
+        yield _format_sse(
+            "final",
+            {
+                "type": "final",
+                "response": response_text,
+                "thread_id": thread_id,
+                "cached": False,
+            },
+        )
+    except Exception as exc:
+        yield _format_sse(
+            "error",
+            {
+                "type": "error",
+                "message": str(exc),
+                "thread_id": thread_id,
+            },
+        )

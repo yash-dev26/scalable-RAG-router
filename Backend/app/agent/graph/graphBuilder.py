@@ -70,6 +70,7 @@ def build_graph(checkpointer=None):
             "rewrite_single":  "single_rewrite",
             "rewrite_multi":   "multi_rewrite",
             "llm":             "llm",
+            "generate":        "generate",
         },
     )
 

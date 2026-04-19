@@ -43,6 +43,7 @@ async def gen_embeddingsAndStoreInQdrant(
     chunks: List[str],
     file_id: str,
     user_id: str,
+    content_hash: str,
 ) -> dict:
     
     all_embeddings: List[List[float]] = []
@@ -62,6 +63,7 @@ async def gen_embeddingsAndStoreInQdrant(
                 "file_id": file_id,
                 "user_id": user_id,
                 "chunk_index": idx,
+                "content_hash": content_hash,
             },
         }
         for idx, (chunk, embedding) in enumerate(zip(chunks, all_embeddings))
