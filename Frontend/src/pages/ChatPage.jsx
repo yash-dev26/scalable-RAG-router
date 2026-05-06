@@ -36,7 +36,7 @@ function ChatPage() {
   const [streamTrace, setStreamTrace] = useState([]);
   const [streamMessage, setStreamMessage] = useState("Ready");
   const [threadId, setThreadId] = useState(() => `t_${Math.random().toString(36).slice(2, 8)}`);
-  const [uploadedFileName, setUploadedFileName] = useState("adaptive_rag_docs_v2.pdf");
+  const [uploadedFileName, setUploadedFileName] = useState("No file uploaded");
   const [hasUploadedFile, setHasUploadedFile] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [ingestedFileId, setIngestedFileId] = useState(null);
@@ -280,7 +280,7 @@ function ChatPage() {
   const latestSources = entries.length > 0 ? entries[entries.length - 1].sources : [];
 
   return (
-    <div className="flex flex-col bg-slate-900" style={{ height: "100vh", paddingTop: 60, fontFamily: "'Sora', sans-serif" }}>
+    <div className="flex flex-col bg-slate-900" style={{ height: "100vh", fontFamily: "'Sora', sans-serif" }}>
       <div className="flex flex-1 overflow-hidden">
         <div className="w-64 min-w-64 bg-slate-800 border-r border-slate-700 flex flex-col p-4 overflow-y-auto">
           <p className="font-mono text-xs text-slate-600 tracking-widest mb-3">SESSION</p>
@@ -310,8 +310,6 @@ function ChatPage() {
           {[
             ["Thread ID", threadId],
             ["Queries", entries.length],
-            ["Model", "gpt-4o"],
-            ["Strategy", "adaptive"],
           ].map(([label, value]) => (
             <div key={label} className="flex items-center justify-between mb-1.5">
               <span className="text-xs text-slate-600">{label}</span>
@@ -319,24 +317,14 @@ function ChatPage() {
             </div>
           ))}
 
-          <p className="font-mono text-xs text-slate-600 tracking-widest mt-5 mb-2">PIPELINE NODES</p>
-          {PIPELINE_NODES_LIST.map((node) => (
-            <div key={node} className="flex items-center gap-2 mb-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 opacity-50" />
-              <span className="font-mono text-xs text-slate-500">{node}</span>
-            </div>
-          ))}
         </div>
 
         <div className="flex-1 flex flex-col overflow-hidden bg-slate-900">
           <div className="flex-1 overflow-y-auto px-10 py-8 flex flex-col gap-8" ref={feedRef}>
             {entries.length === 0 && !isLoading && (
               <div className="flex-1 flex flex-col items-center justify-center py-24 text-center">
-                <div className="w-16 h-16 bg-emerald-500/8 border border-emerald-500/20 rounded-2xl flex items-center justify-center text-2xl mb-5">
-                  ⬡
-                </div>
-                <h3 className="text-lg font-semibold mb-2">Adaptive RAG Agent</h3>
-                <p className="text-slate-500 text-sm max-w-xs leading-relaxed mb-8">
+                <p className="text-slate-500 text-sm mb-5">Upload a document, then ask a question.</p>
+                <p className="text-slate-500 text-sm max-w-xs leading-relaxed mb-4">
                   Ask a question about your document. Every retrieval step will be shown transparently.
                 </p>
                 <div className="flex flex-col gap-2 w-full max-w-sm">

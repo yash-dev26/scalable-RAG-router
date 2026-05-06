@@ -20,7 +20,6 @@ function DocPanel({ sources }) {
           >
             <div className="flex items-center justify-between mb-1">
               <span className="font-mono text-xs text-slate-500">#{doc.rank}</span>
-              <span className="font-mono text-xs text-slate-600">{doc.id}</span>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed mb-2">{doc.text}</p>
             <div className="flex items-center gap-2">

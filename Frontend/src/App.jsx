@@ -8,10 +8,9 @@ export default function App() {
   return (
     <Router>
       <FontLink />
-      <div className="bg-slate-950 text-slate-200 min-h-screen">
-        <Nav />
+      <div className="bg-[#0f1113] text-[#e6e6e6] ">
         <Routes>
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={<><Nav /><LandingPage /></>} />
           <Route path="/chat" element={<ChatPage />} />
         </Routes>
       </div>

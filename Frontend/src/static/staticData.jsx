@@ -30,47 +30,6 @@ const LOADING_STEPS = [
   "Generating response...",
 ];
 
-const MOCK_RESPONSES = [
-  {
-    answer:
-      "**Adaptive RAG** is an evolved retrieval-augmented generation architecture that introduces a *planning layer* before retrieval. Unlike **naive RAG** which blindly retrieves and passes documents to the LLM, adaptive RAG first evaluates whether retrieval is necessary at all.\n\nThe key differences are:\n- A `pre_planner` node decides the retrieval strategy\n- Queries are rewritten for improved vector similarity\n- Retrieved documents are evaluated and reranked\n- Confidence scoring determines whether to use retrieval or fallback to parametric memory",
-    sources: [
-      { id: "doc_a3f2", text: "Adaptive RAG extends standard RAG by incorporating a planning phase that dynamically routes queries through different retrieval strategies...", score: 0.91, rank: 1 },
-      { id: "doc_b1c8", text: "Unlike naive retrieval pipelines, adaptive systems maintain a confidence evaluator that can bypass retrieval entirely for factual queries...", score: 0.84, rank: 2 },
-      { id: "doc_e9d1", text: "Query rewriting in multi-step RAG has been shown to improve retrieval precision by up to 34% on domain-specific corpora...", score: 0.76, rank: 3 },
-    ],
-    confidence: 0.89,
-    pipeline: [
-      { name: "pre_planner", status: "done", detail: "Classified as retrieval-required query. Strategy: multi_rewrite", badge: null },
-      { name: "multi_rewrite", status: "done", detail: "Generated 3 query variants: semantic expansion + entity decomposition", badge: "rewrite" },
-      { name: "retrieve", status: "done", detail: "Qdrant top-k=5 retrieved. Reciprocal rank fusion applied.", badge: null },
-      { name: "evaluator", status: "done", detail: "Context relevance: 0.89. Passed threshold (>0.75). Proceeding to rerank.", badge: null },
-      { name: "rerank", status: "done", detail: "Cross-encoder reranked 5 → 3 documents. Dropped 2 low-signal chunks.", badge: null },
-      { name: "generate", status: "done", detail: "Final answer generated with 3-document context window.", badge: null },
-    ],
-    cacheHit: false,
-    processingMs: 1240,
-  },
-  {
-    answer:
-      "The `evaluator` node computes a **context relevance score** by comparing the semantic similarity between the rewritten query and each retrieved document chunk. This is done in a two-pass approach:\n\n1. **Pass 1**: Compute cosine similarity between query embedding and document embeddings\n2. **Pass 2**: Cross-encoder scores the top-k pairs for fine-grained relevance\n\nIf the aggregate score falls below `CONFIDENCE_THRESHOLD = 0.75`, the graph routes to `fallback_generate` using only the LLM's parametric knowledge.",
-    sources: [
-      { id: "doc_f4a9", text: "The evaluator node implements a dual-pass scoring mechanism combining dense retrieval scores with cross-encoder reranking...", score: 0.93, rank: 1 },
-      { id: "doc_c2b7", text: "Confidence thresholds in RAG systems prevent hallucination by detecting low-quality retrieval before LLM generation...", score: 0.87, rank: 2 },
-    ],
-    confidence: 0.93,
-    pipeline: [
-      { name: "pre_planner", status: "done", detail: "Classified as retrieval-required. Strategy: single_rewrite", badge: null },
-      { name: "single_rewrite", status: "done", detail: "Query rewritten with entity expansion.", badge: "rewrite" },
-      { name: "retrieve", status: "done", detail: "Qdrant top-k=4 retrieved.", badge: null },
-      { name: "evaluator", status: "done", detail: "Context relevance: 0.93. Passed threshold.", badge: null },
-      { name: "rerank", status: "done", detail: "Reranked 4 → 2 documents.", badge: null },
-      { name: "generate", status: "done", detail: "Answer generated from 2 high-confidence chunks.", badge: null },
-    ],
-    cacheHit: true,
-    processingMs: 48,
-  },
-];
 
 const STATIC_DATA = {
   NAIVE_NODES,
@@ -80,7 +39,6 @@ const STATIC_DATA = {
     TECH_STACK,
     PIPELINE_NODES_LIST,
     LOADING_STEPS,
-    MOCK_RESPONSES,
 };
 
 export default STATIC_DATA;

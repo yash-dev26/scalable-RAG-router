@@ -5,7 +5,6 @@ import SectionDivider from "../components/landing/SectionDivider";
 import ArchitectureSection from "../components/landing/ArchitectureSection";
 import DifferentiatorsSection from "../components/landing/DifferentiatorsSection";
 import TechStackSection from "../components/landing/TechStackSection";
-import DemoPreviewSection from "../components/landing/DemoPreviewSection";
 import CtaSection from "../components/landing/CtaSection";
 
 const { NAIVE_NODES, ADAPTIVE_NODES, ADAPTIVE_HIGHLIGHTED, DIFFERENTIATORS, TECH_STACK } = STATIC_DATA;
@@ -28,7 +27,6 @@ function LandingPage() {
       <SectionDivider />
       <TechStackSection techStack={TECH_STACK} />
       <SectionDivider />
-      <DemoPreviewSection />
       <CtaSection onLaunch={() => navigate("/chat")} />
     </div>
   );

@@ -10,7 +10,7 @@ function Nav() {
         to="/"
         className="flex items-center gap-2.5 font-mono text-emerald-400 text-xs font-semibold no-underline tracking-wider"
       >
-        <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981] animate-pulse" />
+        <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]" />
         adaptive-rag
       </Link>
       <div className="flex items-center gap-8">

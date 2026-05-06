@@ -7,8 +7,11 @@ html, body, #root {
 }
 
 body {
-  background: #050507;
-  color: #f0efff;
+  background:
+    radial-gradient(circle at top, rgba(255,255,255,0.03), transparent 40%),
+    #0f1113;
+
+  color: #e8e8e8;
   overflow-x: hidden;
 }
 
