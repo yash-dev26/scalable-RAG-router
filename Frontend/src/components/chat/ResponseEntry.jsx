@@ -22,18 +22,19 @@ function ResponseEntry({ entry }) {
         </div>
 
         <div className="px-5 py-5">
-          <ReactMarkdown
-            className="text-slate-300 text-sm leading-loose prose-sm max-w-none"
-            components={{
+          <div className="text-slate-300 text-sm leading-loose prose-sm max-w-none">
+            <ReactMarkdown
+              components={{
                 strong: ({ children }) => <strong className="text-white font-semibold">{children}</strong>,
                 code: ({ children }) => <code className="bg-slate-700 text-emerald-400 font-mono text-xs px-1.5 py-0.5 rounded">{children}</code>,
                 p: ({ children }) => <p className="mb-3 last:mb-0">{children}</p>,
                 ul: ({ children }) => <ul className="list-disc list-inside mb-3 space-y-1">{children}</ul>,
                 li: ({ children }) => <li className="text-slate-300">{children}</li>,
-            }}
+              }}
             >
-            {entry.answer}
-          </ReactMarkdown>
+              {entry.answer}
+            </ReactMarkdown>
+          </div>
         </div>
 
         <div className="px-5 py-3 border-t border-slate-700">

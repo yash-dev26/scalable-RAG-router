@@ -1,6 +1,6 @@
 function HeroSection({ onLaunch }) {
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 py-20 overflow-hidden">
+    <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 py-10 overflow-hidden">
       <div
         className="absolute inset-0 pointer-events-none"
         style={{

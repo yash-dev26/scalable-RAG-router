@@ -10,8 +10,8 @@ function Nav() {
         to="/"
         className="flex items-center gap-2.5 font-mono text-emerald-400 text-xs font-semibold no-underline tracking-wider"
       >
-        <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]" />
-        adaptive-rag
+        
+        ADAPTIVE RAG AGENT
       </Link>
       <div className="flex items-center gap-8">
         <a
@@ -19,6 +19,12 @@ function Nav() {
           className="font-mono text-slate-400 text-xs hover:text-emerald-400 transition-colors no-underline"
         >
           Architecture
+        </a>
+        <a
+          href="#capabilities"
+          className="font-mono text-slate-400 text-xs hover:text-emerald-400 transition-colors no-underline"
+        >
+          Capabilities
         </a>
         <a
           href="https://github.com/yash-dev26/adaptive-rag"

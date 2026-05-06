@@ -29,6 +29,7 @@ async def ingest(
     stored_path.write_bytes(content)
 
     try:
+        print(f"[ingest] Received file upload: user_id={user_id}, file_id={file_id}, filename={file.filename}, content_hash={content_hash}")
         ingest_result = await ingest_data(
             IngestRequest(
                 user_id=user_id,

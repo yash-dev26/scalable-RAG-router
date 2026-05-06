@@ -18,9 +18,8 @@ async def lifespan(app: FastAPI):
     with connect_to_mongodb() as checkpointer:
         print("Successfully connected to MongoDB.")
         app.state.graph = build_graph(checkpointer=checkpointer)
-        
-        cleanup_task = asyncio.create_task(cleanup_semantic_cache())
         ensure_collections()
+        cleanup_task = asyncio.create_task(cleanup_semantic_cache())
 
         yield
 

@@ -1,6 +1,6 @@
 function DifferentiatorsSection({ differentiators }) {
   return (
-    <section className="max-w-6xl mx-auto px-6 py-24">
+    <section id="capabilities" className="max-w-6xl mx-auto px-6 py-24">
       <p className="font-mono text-xs text-emerald-400 tracking-widest mb-3">CAPABILITIES</p>
       <h2 className="text-4xl font-bold tracking-tight mb-12">What makes this system non-trivial</h2>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">

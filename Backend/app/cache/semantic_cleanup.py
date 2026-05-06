@@ -10,12 +10,18 @@ from app.config.server import config
 async def cleanup_semantic_cache(interval: int = 600):
     while True:
         try:
+            collection_name = config.get("semantic_cache_collection_name")
+            if not collection_name:
+                print("[cleanup] semantic cache collection not configured; skipping")
+                await asyncio.sleep(interval)
+                continue
+
             current_time = int(time.time())
 
             print("[cleanup] running semantic cache cleanup...")
 
             qdrant_client.delete(
-                collection_name=config["semantic_cache_collection_name"],
+                collection_name=collection_name,
                 points_selector=Filter(
                     must=[
                         FieldCondition(

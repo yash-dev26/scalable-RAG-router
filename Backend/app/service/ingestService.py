@@ -4,6 +4,7 @@ from app.config.server import config
 from app.repository.qdrant import find_existing_file_id_by_content_hash
 
 async def ingest_data(request):
+    print(f"[ingest] Starting ingestion for user_id={request.user_id}, file_id={request.file_id}")
     existing_file_id = find_existing_file_id_by_content_hash(
         collection_name=config["qdrant_collection_name"],
         user_id=request.user_id,
@@ -26,7 +27,7 @@ async def ingest_data(request):
     print(f"Loaded text from file: {text[:100]}...")  # Debug: Print the first 100 characters of the loaded text
 
     chunks = split_text(text)
-    
+    print(f"Split text into chunks: {len(chunks)} chunks")
 
     result = await gen_embeddingsAndStoreInQdrant(
         chunks,

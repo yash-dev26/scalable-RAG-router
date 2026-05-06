@@ -324,9 +324,6 @@ function ChatPage() {
             {entries.length === 0 && !isLoading && (
               <div className="flex-1 flex flex-col items-center justify-center py-24 text-center">
                 <p className="text-slate-500 text-sm mb-5">Upload a document, then ask a question.</p>
-                <p className="text-slate-500 text-sm max-w-xs leading-relaxed mb-4">
-                  Ask a question about your document. Every retrieval step will be shown transparently.
-                </p>
                 <div className="flex flex-col gap-2 w-full max-w-sm">
                   {["What is adaptive RAG?", "How does the evaluator node work?", "Explain query rewriting strategies"].map(
                     (suggestion) => (

@@ -6,4 +6,3 @@ qdrant_client = QdrantClient(
     api_key=config["qdrant_api_key"],
 )
 
-print(qdrant_client.get_collections())
