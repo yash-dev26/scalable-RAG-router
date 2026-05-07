@@ -44,7 +44,7 @@ def reranking_node(state: GraphState):
     if not docs:
         return state
 
-    pairs = [(query, doc) for doc in docs]
+    pairs = [(query, doc["text"]) for doc in docs]
 
     model = _get_reranker_model()
     if model is None:
@@ -52,10 +52,19 @@ def reranking_node(state: GraphState):
 
     scores = model.predict(pairs)
 
-    scored_docs = list(zip(docs, scores))
-    ranked = sorted(scored_docs, key=lambda x: x[1], reverse=True)
+    scored_docs = []
 
-    top_docs = [doc for doc, _ in ranked[:4]]
+    for doc, score in zip(docs, scores):
+        doc["rerank_score"] = float(score)
+        scored_docs.append(doc)
+
+    ranked = sorted(
+        scored_docs,
+        key=lambda x: x["rerank_score"],
+        reverse=True
+    )
+
+    top_docs = ranked[:4]
 
     return {
         "context": top_docs

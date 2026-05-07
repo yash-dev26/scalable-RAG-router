@@ -54,7 +54,7 @@ def post_retrieval_evaluator_node(state: GraphState) -> dict:
 
     # Pass the query + top-3 doc snippets (first 300 chars each)
     snippets = "\n\n".join(
-        f"[Doc {i+1}] {doc[:300]}" for i, doc in enumerate(docs[:3])
+        f"[Doc {i+1}] {doc['text'][:300]}" for i, doc in enumerate(docs[:3])
     )
     avg_score = sum(scores[:3]) / len(scores[:3]) if scores else 0.0
 
@@ -79,7 +79,7 @@ Guidelines:
 - "generate"       → docs clearly address the query
 - "rewrite_single" → docs exist but query may have been misunderstood; one rewrite likely helps
 - "rewrite_multi"  → docs are marginally relevant; diverse sub-queries would improve coverage
-- "llm_fallback"   → docs are completely off-topic; general knowledge is better
+- "llm_fallback"   → docs are completely off-topic; general knowledge is better; they must be completely off topic
 """
 
     response = openai_client.chat.completions.create(

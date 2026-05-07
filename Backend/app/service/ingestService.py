@@ -24,7 +24,6 @@ async def ingest_data(request):
         }
 
     text = load_file(request.file_path)
-    print(f"Loaded text from file: {text[:100]}...")  # Debug: Print the first 100 characters of the loaded text
 
     chunks = split_text(text)
     print(f"Split text into chunks: {len(chunks)} chunks")

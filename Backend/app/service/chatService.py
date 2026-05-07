@@ -213,6 +213,7 @@ async def stream_chat_events(request: ChatRequest, graph):
                 "response": semantic_hit,
                 "thread_id": thread_id,
                 "cached": "semantic",
+                "sources": [],
             },
         )
         return
@@ -240,6 +241,7 @@ async def stream_chat_events(request: ChatRequest, graph):
                 "response": cached_response,
                 "thread_id": thread_id,
                 "cached": True,
+                "sources": [],
             },
         )
         return
@@ -321,6 +323,28 @@ async def stream_chat_events(request: ChatRequest, graph):
         if response_text is None:
             response_text = "I could not generate a response right now."
 
+        # Capture the final graph state to extract context/sources
+        sources = []
+        try:
+            final_state = graph.get_state(config=invoke_config)
+            if final_state and hasattr(final_state, 'values'):
+                final_state_dict = final_state.values
+            else:
+                final_state_dict = final_state if isinstance(final_state, dict) else {}
+            
+            context = final_state_dict.get("context") if isinstance(final_state_dict, dict) else None
+            if context and isinstance(context, list):
+                sources = [
+                    {
+                        "text": item.get("text") if isinstance(item, dict) else item,
+                        "score": item.get("qdrant_score") if isinstance(item, dict) else 0,
+                        "payload": item if isinstance(item, dict) else {},
+                    }
+                    for item in context
+                ]
+        except Exception as e:
+            print(f"[chat] Warning: could not retrieve final state for sources: {e}")
+
         if confidence is None or confidence > 0.6:
             set_semantic_cache(
                 request.query,
@@ -343,6 +367,7 @@ async def stream_chat_events(request: ChatRequest, graph):
                 "response": response_text,
                 "thread_id": thread_id,
                 "cached": False,
+                "sources": sources,
             },
         )
     except Exception as exc:

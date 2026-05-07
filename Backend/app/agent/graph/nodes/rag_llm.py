@@ -19,7 +19,9 @@ def generate_node(state: GraphState):
     messages_to_add = []
 
     if context:
-        context_text = "\n\n".join(context)
+        context_text = "\n\n".join(
+            doc["text"] for doc in context
+        )
 
         messages = [
             SystemMessage(

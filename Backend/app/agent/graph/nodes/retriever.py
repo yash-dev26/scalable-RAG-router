@@ -52,8 +52,8 @@ def retrieve_node(state: GraphState) -> dict:
     final_docs = fused_docs[:8]
 
     return {
-        "context": [doc["text"] for doc in final_docs],
-        "scores": [doc["qdrant_score"] for doc in final_docs],
-        "rrf_scores": [doc["rrf_score"] for doc in final_docs],
-        "rewrite_attempts": (state.rewrite_attempts or 0) + 1,
+    "context": final_docs,
+    "scores": [doc["qdrant_score"] for doc in final_docs],
+    "rrf_scores": [doc["rrf_score"] for doc in final_docs],
+    "rewrite_attempts": (state.rewrite_attempts or 0) + 1,
     }

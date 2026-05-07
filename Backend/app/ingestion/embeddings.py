@@ -55,13 +55,18 @@ async def gen_embeddingsAndStoreInQdrant(
 
     for batch_start in range(0, len(chunks), BATCH_SIZE):
         batch = chunks[batch_start : batch_start + BATCH_SIZE]
+        batch_texts = [chunk["text"] for chunk in batch]
+
         batch_end = batch_start + len(batch)
+
         print(f"[embeddings] Dense embedding batch {batch_start}:{batch_end} (size={len(batch)})")
+
         try:
-            embeddings = _embed_batch(batch)
+            embeddings = _embed_batch(batch_texts)
         except Exception as e:
             print(f"[embeddings] Dense embedding batch failed at {batch_start}:{batch_end} -> {type(e).__name__}: {e}")
             raise
+
         all_embeddings.extend(embeddings)
 
     points = [
@@ -69,15 +74,16 @@ async def gen_embeddingsAndStoreInQdrant(
             "id": str(uuid4()),
             "vector": embedding,
             "payload": {
-                "chunk": chunk,
-                "text": chunk,
+                "chunk": chunk_data["text"],
+                "text": chunk_data["text"],
+                "page": chunk_data["page"],
                 "file_id": file_id,
                 "user_id": user_id,
                 "chunk_index": idx,
                 "content_hash": content_hash,
             },
         }
-        for idx, (chunk, embedding) in enumerate(zip(chunks, all_embeddings))
+        for idx, (chunk_data, embedding) in enumerate(zip(chunks, all_embeddings))
     ]
 
     print(

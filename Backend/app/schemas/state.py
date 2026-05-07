@@ -31,7 +31,7 @@ class GraphState(BaseModel):
     # ---------------------------------------------------
     # Retrieval Output
     # ---------------------------------------------------
-    context: Optional[List[str]] = None          # final docs (after RRF / rerank)
+    context: Optional[List[dict]] = None         # final docs (after RRF / rerank)
     scores: Optional[List[float]] = None         # similarity scores
     rrf_scores: Optional[List[float]] = None     # for debugging / advanced tuning
 

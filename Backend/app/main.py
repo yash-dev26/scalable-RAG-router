@@ -28,7 +28,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 origins = [
-    "http://localhost:5173",   # Vite
+    "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
 

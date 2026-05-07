@@ -143,12 +143,34 @@ function ChatPage() {
 
       setThreadId(finalPayload.thread_id || threadId);
 
+      // Map backend sources to UI-friendly format and extract page numbers
+      function derivePageFromSource(s) {
+        if (!s) return null;
+        const payload = s.payload || {};
+        if (s.page) return s.page;
+        if (payload.page) return payload.page;
+        if (payload.page_number) return payload.page_number;
+        if (payload.pagenum) return payload.pagenum;
+        const text = s.text || payload.chunk || payload.text || "";
+        const m = text.match(/page[: ]+(\d+)/i) || text.match(/p\.\s*(\d+)/i);
+        if (m) return Number(m[1]);
+        return null;
+      }
+
+      const mappedSources = (finalPayload.sources || []).map((s, idx) => ({
+        id: s.id ?? (s.payload && s.payload.id) ?? `src_${idx}`,
+        text: s.text ?? (s.payload && s.payload.chunk) ?? (s.payload && s.payload.text) ?? s.content ?? "",
+        score: s.score ?? s.similarity ?? (s.payload && s.payload.score) ?? 0,
+        rank: idx + 1,
+        page: derivePageFromSource(s),
+      }));
+
       setEntries((prev) => [
         ...prev,
         {
           query: nextQuery,
           answer: finalPayload.response,
-          sources: [],
+          sources: mappedSources,
           confidence: finalPayload.cached ? 1 : 0.75,
           pipeline: collectedTrace.length > 0
             ? collectedTrace.map((item) => ({
@@ -301,7 +323,7 @@ function ChatPage() {
                   ? "Uploading..."
                   : hasUploadedFile
                     ? `Ingested · ${ingestedFileId}`
-                    : "Indexed · Ready"}
+                    : "Ready"}
               </span>
             </div>
           </div>
@@ -320,7 +342,7 @@ function ChatPage() {
         </div>
 
         <div className="flex-1 flex flex-col overflow-hidden bg-slate-900">
-          <div className="flex-1 overflow-y-auto px-10 py-8 flex flex-col gap-8" ref={feedRef}>
+          <div className="flex-1 overflow-y-auto px-10 py-4 flex flex-col gap-3" ref={feedRef}>
             {entries.length === 0 && !isLoading && (
               <div className="flex-1 flex flex-col items-center justify-center py-24 text-center">
                 <p className="text-slate-500 text-sm mb-5">Upload a document, then ask a question.</p>

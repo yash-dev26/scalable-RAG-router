@@ -14,21 +14,20 @@ function ResponseEntry({ entry }) {
       </div>
 
       <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-2.5 border-b border-slate-700">
+        <div className="flex items-center px-4 py-2.5 border-b border-slate-700">
           <span className="font-mono text-xs text-slate-500">
           {entry.cacheHit ? "⚡ cached" : ""}
           </span>
-          <span className="font-mono text-xs text-slate-600">{entry.processingMs}ms</span>
         </div>
 
-        <div className="px-5 py-5">
-          <div className="text-slate-300 text-sm leading-loose prose-sm max-w-none">
+        <div className="px-5 py-4">
+          <div className="text-slate-300 text-sm leading-relaxed prose-sm max-w-none">
             <ReactMarkdown
               components={{
                 strong: ({ children }) => <strong className="text-white font-semibold">{children}</strong>,
                 code: ({ children }) => <code className="bg-slate-700 text-emerald-400 font-mono text-xs px-1.5 py-0.5 rounded">{children}</code>,
-                p: ({ children }) => <p className="mb-3 last:mb-0">{children}</p>,
-                ul: ({ children }) => <ul className="list-disc list-inside mb-3 space-y-1">{children}</ul>,
+                p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
                 li: ({ children }) => <li className="text-slate-300">{children}</li>,
               }}
             >
