@@ -1,5 +1,6 @@
 import PipelineStep from "./PipelineStep";
 import ReactMarkdown from "react-markdown";
+import { Badge, Button, Card, CardFooter, CardHeader, Collapsible } from "../ui";
 
 function ResponseEntry({ entry }) {
   return (

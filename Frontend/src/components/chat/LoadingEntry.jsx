@@ -1,3 +1,5 @@
+import { Card, CardHeader } from "../ui";
+
 function Dots() {
   return (
     <div className="flex gap-1">

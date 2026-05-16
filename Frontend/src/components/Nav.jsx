@@ -11,7 +11,7 @@ const NAV_LINKS = [
 export default function Nav() {
   return (
     <nav className="fixed top-0 inset-x-0 z-50 h-14 border-b border-zinc-800 bg-zinc-950/90 backdrop-blur-sm">
-      <div className="max-w-7xl mx-auto h-full px-6 flex items-center justify-between">
+      <div className="max-w-6xl mx-auto h-full px-6 flex items-center justify-between">
         <Link to="/" className="font-mono text-sm font-semibold text-zinc-100 tracking-tight no-underline">
           ADAPTIVE RAG
         </Link>
@@ -31,7 +31,7 @@ export default function Nav() {
 
           <SignedOut>
             <SignInButton mode="modal">
-              <Button variant="outline" size="sm" className="font-mono">
+              <Button variant="accent" size="sm" className="font-mono">
                 Sign in
               </Button>
             </SignInButton>

@@ -11,7 +11,7 @@ function HeroSection() {
   return (
     <section className="max-w-4xl mx-auto px-6 pt-32 pb-24">
       <div className="mb-4">
-        <Badge variant="accent">Research Preview</Badge>
+        <Badge variant="accent">RAG with full pipeline visibility</Badge>
       </div>
       <h1 className="text-5xl md:text-6xl font-semibold tracking-tight text-zinc-100 mb-6 leading-none">
         Adaptive RAG<br />

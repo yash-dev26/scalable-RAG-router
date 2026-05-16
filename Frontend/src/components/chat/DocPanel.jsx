@@ -1,3 +1,5 @@
+import { Badge, ScrollArea } from "../ui";
+
 function ContextPanel({ sources }) {
   return (
     <aside className="w-72 shrink-0 border-l border-zinc-800 flex flex-col">

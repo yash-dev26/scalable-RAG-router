@@ -1,3 +1,5 @@
+import { Button, Separator } from "../ui";
+
 function SessionSidebar({ threadId, queryCount, uploadedFileName, ingestedFileId, isUploading, hasUploadedFile, onNewThread }) {
   return (
     <aside className="w-60 shrink-0 border-r border-zinc-800 flex flex-col p-4 gap-4">

@@ -1,3 +1,5 @@
+import { Badge } from "../ui";
+
 function PipelineStep({ step, isLast }) {
   const done = step.status === "done";
   return (

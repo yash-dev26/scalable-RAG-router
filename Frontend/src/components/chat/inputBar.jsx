@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Button, Input, Separator } from "../ui";
 
 function InputBar({ onSubmit, onFileChange, isLoading, isUploading, fileInputRef }) {
   const [value, setValue] = useState("");
