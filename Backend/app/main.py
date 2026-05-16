@@ -10,6 +10,10 @@ from app.cache.semantic_cleanup import cleanup_semantic_cache
 import asyncio
 
 from app.repository.qdrant import ensure_collections
+from app.config.server import config
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 
 
@@ -27,9 +31,12 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 origins = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
+    config["CORS_ORIGINS"].split(",")
 ]
 
 app.add_middleware(

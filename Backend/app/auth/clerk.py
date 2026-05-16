@@ -10,7 +10,10 @@ def verify_token(request: Request):
     if not auth_header:
         raise HTTPException(status_code=401, detail="Missing auth")
 
-    token = auth_header.split(" ")[1]
+    parts = auth_header.split(" ", 1)
+    if len(parts) != 2 or parts[0].lower() != "bearer":
+        raise HTTPException(status_code=401, detail="Invalid auth header")
+    token = parts[1]
 
     try:
         payload = jwt.decode(

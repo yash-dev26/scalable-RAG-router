@@ -6,6 +6,7 @@ from app.service.chatService import process_chat, stream_chat_events
 
 from fastapi import Depends
 from app.auth.clerk import verify_token
+from app.main import limiter    
 
 router = APIRouter()
 
@@ -14,8 +15,8 @@ async def chat(payload: ChatRequest, request: Request, user=Depends(verify_token
     result = await process_chat(payload, request.app.state.graph)
     return result
 
-
 @router.post("/stream")
+@limiter.limit("8/minute")
 async def chat_stream(payload: ChatRequest, request: Request, user=Depends(verify_token)):
     return StreamingResponse(
         stream_chat_events(payload, request.app.state.graph),

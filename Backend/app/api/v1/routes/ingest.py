@@ -6,12 +6,13 @@ from app.service.ingestService import ingest_data
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from fastapi import Depends
 from app.auth.clerk import verify_token
+from app.main import limiter
 
 router = APIRouter()
 
 @router.post("/")
+@limiter.limit("2/minute")
 async def ingest(
-    user_id: str = Form(...),
     file: UploadFile = File(...),
     user=Depends(verify_token)
 ):
@@ -32,7 +33,7 @@ async def ingest(
     stored_path.write_bytes(content)
 
     try:
-        print(f"[ingest] Received file upload: user_id={user_id}, file_id={file_id}, filename={file.filename}, content_hash={content_hash}")
+        print(f"[ingest] Received file upload: user_id={user['sub']}, file_id={file_id}, filename={file.filename}, content_hash={content_hash}")
         ingest_result = await ingest_data(
             IngestRequest(
                 user_id=user["sub"],
