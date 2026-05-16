@@ -1,56 +1,59 @@
-function ArchitectureSection({ naiveNodes, adaptiveNodes, adaptiveHighlighted }) {
+import { Card } from "../ui";
+
+const NAIVE_NODES = ["Input", "Retrieve", "Output"];
+const ADAPTIVE_NODES = ["Input", "Plan", "Rewrite", "Retrieve", "Evaluate", "Rerank", "Output"];
+const ADAPTIVE_HIGHLIGHTED = new Set(["Plan", "Rewrite", "Evaluate", "Rerank"]);
+
+function ArchitectureSection() {
   return (
-    <section id="how-it-works" className="max-w-6xl mx-auto px-6 py-24">
-      <p className="text-xs text-emerald-400 tracking-[0.2em] uppercase mb-3">Architecture</p>
-      <h2 className="text-3xl md:text-4xl font-semibold tracking-[-0.04em] mb-3">Naive RAG vs. Adaptive RAG</h2>
-      <p className="text-slate-400 max-w-lg leading-relaxed mb-12 text-base">
-        Standard RAG pipelines retrieve blindly. This system plans, rewrites, evaluates, and reranks before
-        generating - exposing every decision.
+    <section id="how-it-works" className="max-w-4xl mx-auto px-6 py-20">
+      <p className="text-[11px] font-mono text-emerald-500 tracking-widest uppercase mb-3">Architecture</p>
+      <h2 className="text-3xl font-semibold tracking-tight text-zinc-100 mb-2">Naive RAG vs. Adaptive RAG</h2>
+      <p className="text-zinc-500 mb-10 max-w-lg leading-relaxed">
+        Standard pipelines retrieve blindly. This one plans, rewrites, evaluates, and reranks before generating.
       </p>
 
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-7">
-          <p className="text-xs text-slate-500 tracking-[0.18em] uppercase mb-4">Naive RAG</p>
+      <div className="grid md:grid-cols-2 gap-4">
+        <Card className="p-6">
+          <p className="text-[10px] font-mono text-zinc-600 uppercase tracking-widest mb-4">Naive</p>
           <div className="flex items-center flex-wrap gap-2">
-            {naiveNodes.map((node, index) => (
+            {NAIVE_NODES.map((node, i) => (
               <span key={node} className="flex items-center gap-2">
-                <span className="bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded">{node}</span>
-                {index < naiveNodes.length - 1 && <span className="text-slate-600 text-xs">→</span>}
+                <span className="bg-zinc-800 text-zinc-400 text-xs font-mono px-3 py-1.5 rounded">{node}</span>
+                {i < NAIVE_NODES.length - 1 && <span className="text-zinc-700 text-xs">→</span>}
               </span>
             ))}
           </div>
-          <p className="text-slate-400 text-sm mt-6 leading-relaxed">
-            Fixed retrieval with no adaptation. Query is sent directly to vector DB, top-k results passed to LLM. No
-            evaluation, no reranking, no fallback logic.
+          <p className="text-sm text-zinc-600 mt-5 leading-relaxed">
+            Fixed retrieval, no adaptation. Query goes straight to the vector DB; top-k results passed to LLM.
           </p>
-        </div>
+        </Card>
 
-        <div className="bg-slate-800 border border-emerald-500/30 rounded-xl p-7">
-          <p className="text-xs text-emerald-400 tracking-[0.18em] uppercase mb-4">Adaptive RAG</p>
+        <Card className="p-6 border-emerald-500/20">
+          <p className="text-[10px] font-mono text-emerald-500 uppercase tracking-widest mb-4">Adaptive</p>
           <div className="flex items-center flex-wrap gap-2">
-            {adaptiveNodes.map((node, index) => (
+            {ADAPTIVE_NODES.map((node, i) => (
               <span key={node} className="flex items-center gap-2">
                 <span
-                  className={`font-mono text-xs px-3 py-1.5 rounded ${
-                    adaptiveHighlighted.has(node)
+                  className={[
+                    "text-xs font-mono px-3 py-1.5 rounded",
+                    ADAPTIVE_HIGHLIGHTED.has(node)
                       ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/25"
-                      : "bg-slate-700 text-slate-300"
-                  }`}
+                      : "bg-zinc-800 text-zinc-400",
+                  ].join(" ")}
                 >
                   {node}
                 </span>
-                {index < adaptiveNodes.length - 1 && <span className="text-slate-600 text-xs">→</span>}
+                {i < ADAPTIVE_NODES.length - 1 && <span className="text-zinc-700 text-xs">→</span>}
               </span>
             ))}
           </div>
-          <p className="text-slate-400 text-sm mt-6 leading-relaxed">
-            LangGraph-orchestrated pipeline with a planner node, multi-strategy query rewriting, confidence-scored
-            evaluation, and cross-encoder reranking before generation.
+          <p className="text-sm text-zinc-600 mt-5 leading-relaxed">
+            LangGraph-orchestrated with planner, multi-strategy rewriting, confidence scoring, and cross-encoder reranking.
           </p>
-        </div>
+        </Card>
       </div>
     </section>
   );
 }
-
 export default ArchitectureSection;

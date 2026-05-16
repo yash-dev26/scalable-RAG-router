@@ -1,34 +1,22 @@
-import STATIC_DATA from "../static/staticData";
+import { Separator } from "../components/ui";
 import HeroSection from "../components/landing/HeroSection";
-import SectionDivider from "../components/landing/SectionDivider";
 import ArchitectureSection from "../components/landing/ArchitectureSection";
-import DifferentiatorsSection from "../components/landing/DifferentiatorsSection";
+import DifferentiatorsSection from "../components/landing/Capabilities.jsx";
 import TechStackSection from "../components/landing/TechStackSection";
 import CtaSection from "../components/landing/CtaSection";
 
-const { NAIVE_NODES, ADAPTIVE_NODES, ADAPTIVE_HIGHLIGHTED, DIFFERENTIATORS, TECH_STACK } = STATIC_DATA;
-
-
-function LandingPage() {
-
+export default function LandingPage() {
   return (
-    <div className="pt-15 font-sans" style={{ paddingTop: 60 }}>
+    <main className="pt-14">
       <HeroSection />
-      <SectionDivider />
-      <ArchitectureSection
-        naiveNodes={NAIVE_NODES}
-        adaptiveNodes={ADAPTIVE_NODES}
-        adaptiveHighlighted={ADAPTIVE_HIGHLIGHTED}
-      />
-      <SectionDivider />
-      <DifferentiatorsSection differentiators={DIFFERENTIATORS} />
-      <SectionDivider />
-      <TechStackSection techStack={TECH_STACK} />
-      <SectionDivider />
+      <Separator />
+      <ArchitectureSection />
+      <Separator />
+      <DifferentiatorsSection />
+      <Separator />
+      <TechStackSection />
+      <Separator />
       <CtaSection />
-    </div>
+    </main>
   );
 }
-
-export default LandingPage;
-

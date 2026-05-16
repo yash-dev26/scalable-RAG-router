@@ -1,36 +1,29 @@
 function PipelineStep({ step, isLast }) {
+  const done = step.status === "done";
   return (
-    <div className="flex items-start gap-3 pb-4 relative">
-      {!isLast && <div className="absolute left-3.5 top-7 bottom-0 w-px bg-slate-700" />}
+    <div className="flex items-start gap-3 pb-3 relative">
+      {!isLast && (
+        <div className="absolute left-[13px] top-6 bottom-0 w-px bg-zinc-800" />
+      )}
       <div
-        className={`w-7 h-7 rounded-full flex items-center justify-center text-xs shrink-0 z-10
-        ${
-          step.status === "done"
-            ? "bg-emerald-500/12 border border-emerald-500/30 text-emerald-400"
-            : "bg-slate-700 border border-slate-600 text-slate-500"
-        }`}
+        className={[
+          "mt-0.5 w-6 h-6 rounded-full border flex items-center justify-center text-[10px] shrink-0 z-10",
+          done
+            ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
+            : "border-zinc-700 bg-zinc-900 text-zinc-600",
+        ].join(" ")}
       >
-        {step.status === "done" ? "✓" : "–"}
+        {done ? "✓" : "·"}
       </div>
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 pt-0.5">
         <div className="flex items-center gap-2 flex-wrap">
-          <span
-            className={`text-sm font-semibold ${step.status === "done" ? "text-emerald-400" : "text-slate-500"}`}
-          >
+          <span className={["text-xs font-mono", done ? "text-zinc-300" : "text-zinc-600"].join(" ")}>
             {step.name}
           </span>
-          {step.badge === "rewrite" && (
-            <span className="bg-emerald-500/12 text-emerald-400 font-mono text-xs px-2 py-0.5 rounded">
-              rewrite
-            </span>
-          )}
-          {step.badge === "cache" && (
-            <span className="bg-amber-500/15 text-amber-400 font-mono text-xs px-2 py-0.5 rounded">
-              cache
-            </span>
-          )}
+          {step.badge === "rewrite" && <Badge variant="accent">rewrite</Badge>}
+          {step.badge === "cache" && <Badge variant="warning">cached</Badge>}
         </div>
-        <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{step.detail}</p>
+        <p className="text-[11px] text-zinc-600 mt-0.5 leading-relaxed">{step.detail}</p>
       </div>
     </div>
   );

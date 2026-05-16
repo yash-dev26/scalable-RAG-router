@@ -8,5 +8,6 @@ config = {
     "qdrant_collection_name": os.getenv("QDRANT_COLLECTION_NAME"),
     "openai_api_key": os.getenv("OPENAI_API_KEY"),
     "mongodb_uri": os.getenv("MONGODB_URI"),
-    "semantic_cache_collection_name": os.getenv("SEMANTIC_CACHE_COLLECTION_NAME")
+    "semantic_cache_collection_name": os.getenv("SEMANTIC_CACHE_COLLECTION_NAME"),
+    "clerk_pem_public_key": os.getenv("CLERK_PEM_PUBLIC_KEY")
 }

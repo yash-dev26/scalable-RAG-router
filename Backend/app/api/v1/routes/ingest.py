@@ -4,6 +4,8 @@ import hashlib
 from app.schemas.request import IngestRequest
 from app.service.ingestService import ingest_data
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+from fastapi import Depends
+from app.auth.clerk import verify_token
 
 router = APIRouter()
 
@@ -11,6 +13,7 @@ router = APIRouter()
 async def ingest(
     user_id: str = Form(...),
     file: UploadFile = File(...),
+    user=Depends(verify_token)
 ):
     if not file.filename:
         raise HTTPException(status_code=400, detail="No file uploaded")
@@ -32,7 +35,7 @@ async def ingest(
         print(f"[ingest] Received file upload: user_id={user_id}, file_id={file_id}, filename={file.filename}, content_hash={content_hash}")
         ingest_result = await ingest_data(
             IngestRequest(
-                user_id=user_id,
+                user_id=user["sub"],
                 file_id=file_id,
                 file_path=str(stored_path),
                 content_hash=content_hash,

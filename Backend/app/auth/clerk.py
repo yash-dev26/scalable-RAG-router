@@ -1,8 +1,8 @@
 from fastapi import Request, HTTPException
 import jwt
 import os
-
-CLERK_PEM_PUBLIC_KEY = os.getenv("CLERK_PEM_PUBLIC_KEY")
+from app.config.server import config
+CLERK_PEM_PUBLIC_KEY = config["clerk_pem_public_key"]
 
 def verify_token(request: Request):
     auth_header = request.headers.get("Authorization")
@@ -21,5 +21,6 @@ def verify_token(request: Request):
 
         return payload
 
-    except Exception:
+    except Exception as e:
+        print(f"[auth] token verification failed: {e}")
         raise HTTPException(status_code=401, detail="Invalid token")
