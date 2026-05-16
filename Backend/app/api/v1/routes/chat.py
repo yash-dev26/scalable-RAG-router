@@ -4,16 +4,19 @@ from fastapi.responses import StreamingResponse
 from app.schemas.request import ChatRequest
 from app.service.chatService import process_chat, stream_chat_events
 
+from fastapi import Depends
+from app.auth.clerk import verify_token
+
 router = APIRouter()
 
 @router.post("/")
-async def chat(payload: ChatRequest, request: Request):
+async def chat(payload: ChatRequest, request: Request, user=Depends(verify_token)):
     result = await process_chat(payload, request.app.state.graph)
     return result
 
 
 @router.post("/stream")
-async def chat_stream(payload: ChatRequest, request: Request):
+async def chat_stream(payload: ChatRequest, request: Request, user=Depends(verify_token)):
     return StreamingResponse(
         stream_chat_events(payload, request.app.state.graph),
         media_type="text/event-stream",

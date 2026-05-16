@@ -1,5 +1,4 @@
 import STATIC_DATA from "../static/staticData";
-import { useNavigate } from "react-router-dom";
 import HeroSection from "../components/landing/HeroSection";
 import SectionDivider from "../components/landing/SectionDivider";
 import ArchitectureSection from "../components/landing/ArchitectureSection";
@@ -11,11 +10,10 @@ const { NAIVE_NODES, ADAPTIVE_NODES, ADAPTIVE_HIGHLIGHTED, DIFFERENTIATORS, TECH
 
 
 function LandingPage() {
-  const navigate = useNavigate();
 
   return (
     <div className="pt-15 font-sans" style={{ paddingTop: 60 }}>
-      <HeroSection onLaunch={() => navigate("/chat")} />
+      <HeroSection />
       <SectionDivider />
       <ArchitectureSection
         naiveNodes={NAIVE_NODES}
@@ -27,7 +25,7 @@ function LandingPage() {
       <SectionDivider />
       <TechStackSection techStack={TECH_STACK} />
       <SectionDivider />
-      <CtaSection onLaunch={() => navigate("/chat")} />
+      <CtaSection />
     </div>
   );
 }
