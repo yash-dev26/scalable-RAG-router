@@ -302,7 +302,7 @@ function ChatPage() {
   const latestSources = entries.length > 0 ? entries[entries.length - 1].sources : [];
 
   return (
-    <div className="flex flex-col bg-slate-900" style={{ height: "100vh", fontFamily: "'Sora', sans-serif" }}>
+    <div className="flex flex-col bg-slate-900 font-sans" style={{ height: "100vh" }}>
       <div className="flex flex-1 overflow-hidden">
         <div className="w-64 min-w-64 bg-slate-800 border-r border-slate-700 flex flex-col p-4 overflow-y-auto">
           <p className="font-mono text-xs text-slate-600 tracking-widest mb-3">SESSION</p>
@@ -347,7 +347,7 @@ function ChatPage() {
               <div className="flex-1 flex flex-col items-center justify-center py-24 text-center">
                 <p className="text-slate-500 text-sm mb-5">Upload a document, then ask a question.</p>
                 <div className="flex flex-col gap-2 w-full max-w-sm">
-                  {["What is adaptive RAG?", "How does the evaluator node work?", "Explain query rewriting strategies"].map(
+                  {["What is adaptive RAG?", "Explain query rewriting strategies"].map(
                     (suggestion) => (
                       <button
                         key={suggestion}
@@ -393,7 +393,6 @@ function ChatPage() {
               <span className="w-px h-6 bg-slate-700/90 shrink-0" aria-hidden="true" />
               <input
                 className="flex-1 bg-slate-800 border border-slate-700 text-slate-200 text-sm px-4 py-3 rounded-lg outline-none placeholder-slate-600 focus:border-emerald-500/40 transition-colors"
-                style={{ fontFamily: "'Sora', sans-serif" }}
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 onKeyDown={(event) => event.key === "Enter" && handleSubmit()}

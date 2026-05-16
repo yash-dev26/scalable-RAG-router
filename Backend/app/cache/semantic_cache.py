@@ -23,18 +23,22 @@ def get_semantic_cached_response(query: str, user_id: str, file_id: str | None):
     query_embedding = gen_embeddings(query)
     current_time = int(time.time())
 
+    must_conditions = [
+        {"key": "user_id", "match": {"value": user_id}},
+        {
+            "key": "expires_at",
+            "range": {"gte": current_time}
+        },
+    ]
+
+    if file_id is not None:
+        must_conditions.insert(1, {"key": "file_id", "match": {"value": file_id}})
+
     results = qdrant_client.query_points(
         collection_name=config["semantic_cache_collection_name"],
         query=query_embedding,
         query_filter={
-            "must": [
-                {"key": "user_id", "match": {"value": user_id}},
-                {"key": "file_id", "match": {"value": file_id}},
-                {
-                "key": "expires_at",
-                "range": {"gte": current_time}
-                }
-            ]
+            "must": must_conditions
         },
         limit=1
     ).points

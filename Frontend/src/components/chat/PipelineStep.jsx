@@ -1,6 +1,6 @@
 function PipelineStep({ step, isLast }) {
   return (
-    <div className="flex items-start gap-3 pb-5 relative">
+    <div className="flex items-start gap-3 pb-4 relative">
       {!isLast && <div className="absolute left-3.5 top-7 bottom-0 w-px bg-slate-700" />}
       <div
         className={`w-7 h-7 rounded-full flex items-center justify-center text-xs shrink-0 z-10
@@ -15,7 +15,7 @@ function PipelineStep({ step, isLast }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <span
-            className={`font-mono text-xs font-semibold ${step.status === "done" ? "text-emerald-400" : "text-slate-600"}`}
+            className={`text-sm font-semibold ${step.status === "done" ? "text-emerald-400" : "text-slate-500"}`}
           >
             {step.name}
           </span>

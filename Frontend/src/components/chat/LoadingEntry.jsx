@@ -12,13 +12,13 @@ function LoadingEntry({ step, loadingSteps, trace = [], message = "" }) {
           ))}
         </div>
         <div className="min-w-0">
-          <p className="font-mono text-xs text-slate-300 truncate">
+          <p className="text-xs text-slate-300 truncate">
             {message || loadingSteps[step] || "Processing..."}
           </p>
           {trace.length > 0 && (
             <div className="mt-2 space-y-1">
               {trace.map((item) => (
-                <div key={`${item.node}-${item.status}-${item.detail}`} className="flex items-start gap-2 text-xs font-mono text-slate-500">
+                <div key={`${item.node}-${item.status}-${item.detail}`} className="flex items-start gap-2 text-xs text-slate-500">
                   <span className={item.status === "done" ? "text-emerald-400" : "text-amber-400"}>
                     {item.status === "done" ? "✓" : "•"}
                   </span>

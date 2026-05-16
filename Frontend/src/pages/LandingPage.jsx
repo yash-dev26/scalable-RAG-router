@@ -14,7 +14,7 @@ function LandingPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="pt-15" style={{ paddingTop: 60, fontFamily: "'Sora', sans-serif" }}>
+    <div className="pt-15 font-sans" style={{ paddingTop: 60 }}>
       <HeroSection onLaunch={() => navigate("/chat")} />
       <SectionDivider />
       <ArchitectureSection

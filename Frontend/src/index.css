@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+:root {
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --surface: #0f1113;
+  --surface-2: #14181d;
+  --surface-3: #1b2229;
+  --text-primary: #e7ecef;
+  --text-secondary: #97a3ad;
+  --accent: #34d399;
+}
+
 html, body, #root {
   height: 100%;
   margin: 0;
@@ -8,13 +19,25 @@ html, body, #root {
 
 body {
   background:
-    radial-gradient(circle at top, rgba(255,255,255,0.03), transparent 40%),
-    #0f1113;
+    radial-gradient(circle at top, rgba(52,211,153,0.08), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(255,255,255,0.03), transparent 28%),
+    var(--surface);
 
-  color: #e8e8e8;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
   overflow-x: hidden;
 }
 
 html {
   scrollbar-gutter: stable;
+}
+
+::selection {
+  background: rgba(52, 211, 153, 0.25);
+  color: var(--text-primary);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.03em;
+  line-height: 1.05;
 }

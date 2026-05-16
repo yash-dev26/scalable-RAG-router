@@ -1,20 +1,20 @@
 function ArchitectureSection({ naiveNodes, adaptiveNodes, adaptiveHighlighted }) {
   return (
     <section id="how-it-works" className="max-w-6xl mx-auto px-6 py-24">
-      <p className="font-mono text-xs text-emerald-400 tracking-widest mb-3">ARCHITECTURE</p>
-      <h2 className="text-4xl font-bold tracking-tight mb-3">Naive RAG vs. Adaptive RAG</h2>
-      <p className="text-slate-400 max-w-lg leading-relaxed mb-12">
+      <p className="text-xs text-emerald-400 tracking-[0.2em] uppercase mb-3">Architecture</p>
+      <h2 className="text-3xl md:text-4xl font-semibold tracking-[-0.04em] mb-3">Naive RAG vs. Adaptive RAG</h2>
+      <p className="text-slate-400 max-w-lg leading-relaxed mb-12 text-base">
         Standard RAG pipelines retrieve blindly. This system plans, rewrites, evaluates, and reranks before
         generating - exposing every decision.
       </p>
 
       <div className="grid md:grid-cols-2 gap-6">
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-8">
-          <p className="font-mono text-xs text-slate-500 tracking-widest mb-4">◯ NAIVE RAG</p>
+        <div className="bg-slate-800 border border-slate-700 rounded-xl p-7">
+          <p className="text-xs text-slate-500 tracking-[0.18em] uppercase mb-4">Naive RAG</p>
           <div className="flex items-center flex-wrap gap-2">
             {naiveNodes.map((node, index) => (
               <span key={node} className="flex items-center gap-2">
-                <span className="bg-slate-700 text-slate-300 font-mono text-xs px-3 py-1.5 rounded">{node}</span>
+                <span className="bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded">{node}</span>
                 {index < naiveNodes.length - 1 && <span className="text-slate-600 text-xs">→</span>}
               </span>
             ))}
@@ -25,8 +25,8 @@ function ArchitectureSection({ naiveNodes, adaptiveNodes, adaptiveHighlighted })
           </p>
         </div>
 
-        <div className="bg-slate-800 border border-emerald-500/30 rounded-xl p-8">
-          <p className="font-mono text-xs text-emerald-400 tracking-widest mb-4">◈ ADAPTIVE RAG</p>
+        <div className="bg-slate-800 border border-emerald-500/30 rounded-xl p-7">
+          <p className="text-xs text-emerald-400 tracking-[0.18em] uppercase mb-4">Adaptive RAG</p>
           <div className="flex items-center flex-wrap gap-2">
             {adaptiveNodes.map((node, index) => (
               <span key={node} className="flex items-center gap-2">
