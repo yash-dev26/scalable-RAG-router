@@ -42,4 +42,4 @@ Return ONLY valid JSON in this exact shape:
     except Exception:
         queries = [query]
 
-    return {"queries": queries}
+    return {"queries": queries, "rewrite_type": "multi"}
