@@ -50,8 +50,16 @@ export function useChat() {
         }),
       });
 
-      if (!res.ok || !res.body) {
-        throw new Error(`Stream failed (${res.status})`);
+      if (!res.ok) {
+        if (res.status === 429) {
+          throw new Error("Rate limit exceeded. You can make 8 requests per minute. Please wait before trying again.");
+        }
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData?.detail || `Stream failed (${res.status})`);
+      }
+
+      if (!res.body) {
+        throw new Error("No response body from server");
       }
 
       const reader = res.body.getReader();
@@ -109,6 +117,7 @@ export function useChat() {
       ]);
     } catch (err) {
       const message = err?.response?.data?.detail || err.message || "Request failed";
+      const isRateLimit = message.includes("Rate limit");
       setEntries((prev) => [
         ...prev,
         {
@@ -116,7 +125,7 @@ export function useChat() {
           answer: `Error: ${message}`,
           sources: [],
           confidence: 0,
-          pipeline: [{ name: "chat", status: "error", detail: message, badge: null }],
+          pipeline: [{ name: "chat", status: "error", detail: message, badge: isRateLimit ? "rate-limit" : null }],
           cacheHit: false,
         },
       ]);
@@ -140,7 +149,6 @@ export function useChat() {
 
       const { data } = await axios.post(`${API_BASE}/upload/`, formData, {
         headers: {
-          "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
         },
       });

@@ -38,12 +38,7 @@ export default function Nav() {
           </SignedOut>
 
           <SignedIn>
-            <div className="flex items-center gap-4">
-              <Link to="/chat" className="text-sm text-zinc-400 hover:text-zinc-100 transition-colors no-underline">
-                Chat
-              </Link>
               <UserButton />
-            </div>
           </SignedIn>
         </div>
       </div>

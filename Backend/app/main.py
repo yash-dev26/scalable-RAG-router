@@ -11,10 +11,17 @@ import asyncio
 
 from app.repository.qdrant import ensure_collections
 from app.config.server import config
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+from fastapi.responses import JSONResponse
+from app.config.rate_limiter import limiter
 
+
+async def custom_rate_limit_handler(request, exc):
+    """Custom rate limit handler to return clear JSON response."""
+    return JSONResponse(
+        status_code=429,
+        content={"detail": "Rate limit exceeded. Maximum 8 requests per minute allowed."},
+    )
 
 
 @asynccontextmanager
@@ -31,13 +38,10 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_exception_handler(RateLimitExceeded, custom_rate_limit_handler)
 
-origins = [
-    config["CORS_ORIGINS"].split(",")
-]
+origins = config["CORS_ORIGINS"].split(",")
 
 app.add_middleware(
     CORSMiddleware,

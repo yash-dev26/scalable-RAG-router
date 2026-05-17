@@ -24,6 +24,7 @@ function PipelineStep({ step, isLast }) {
           </span>
           {step.badge === "rewrite" && <Badge variant="accent">rewrite</Badge>}
           {step.badge === "cache" && <Badge variant="warning">cached</Badge>}
+          {step.badge === "rate-limit" && <Badge variant="error">rate limited</Badge>}
         </div>
         <p className="text-[11px] text-zinc-600 mt-0.5 leading-relaxed">{step.detail}</p>
       </div>

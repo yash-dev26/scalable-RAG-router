@@ -3,16 +3,17 @@ from pathlib import Path
 import hashlib
 from app.schemas.request import IngestRequest
 from app.service.ingestService import ingest_data
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, File, HTTPException, Request, UploadFile
 from fastapi import Depends
 from app.auth.clerk import verify_token
-from app.main import limiter
+from app.config.rate_limiter import limiter
 
 router = APIRouter()
 
 @router.post("/")
 @limiter.limit("2/minute")
 async def ingest(
+    request: Request,
     file: UploadFile = File(...),
     user=Depends(verify_token)
 ):

@@ -6,7 +6,7 @@ from app.service.chatService import process_chat, stream_chat_events
 
 from fastapi import Depends
 from app.auth.clerk import verify_token
-from app.main import limiter    
+from app.config.rate_limiter import limiter
 
 router = APIRouter()
 

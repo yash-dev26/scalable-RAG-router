@@ -2,6 +2,7 @@ from app.ingestion.embeddings import gen_embeddingsAndStoreInQdrant
 from app.ingestion.chunking import load_file, split_text
 from app.config.server import config
 from app.repository.qdrant import find_existing_file_id_by_content_hash
+from fastapi import HTTPException
 
 async def ingest_data(request):
     print(f"[ingest] Starting ingestion for user_id={request.user_id}, file_id={request.file_id}")
@@ -23,7 +24,10 @@ async def ingest_data(request):
             "message": "Duplicate file already ingested.",
         }
 
-    text = load_file(request.file_path)
+    try:
+        text = load_file(request.file_path)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Uploaded file is not a valid PDF")
 
     chunks = split_text(text)
     print(f"Split text into chunks: {len(chunks)} chunks")
