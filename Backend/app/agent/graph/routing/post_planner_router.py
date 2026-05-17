@@ -23,9 +23,10 @@ def route_after_evaluator(state: GraphState) -> str:
     if attempts >= MAX_REWRITE_ATTEMPTS and action in {"rewrite_single", "rewrite_multi"}:
         return "llm"
 
-    # action == "generate" (or anything else): decide trim vs rerank
-    if len(docs) <= 3:
-        return "trim_docs"
+    # action == "generate" (or anything else): decide whether we can generate directly,
+    # trim the context to the top 4, or pay for reranking.
+    if len(docs) <= 4:
+        return "generate"
 
     if len(scores) >= 2 and (scores[0] - scores[1] > 0.15):
         return "trim_docs"
