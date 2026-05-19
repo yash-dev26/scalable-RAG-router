@@ -1,13 +1,16 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useAuth, useUser } from "@clerk/clerk-react";
 import axios from "axios";
 import { parseSseBlock, upsertTrace, mapSources, randomId } from "../lib/utils.js";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000/api/v1";
+const FIRST_REQUEST_BOOT_HINT_DELAY_MS = 8000;
+const FIRST_REQUEST_BOOT_HINT = "Backend is booting up (free tier cold start). First response can take around a minute.";
 
 export function useChat() {
   const { getToken } = useAuth();
   const { user } = useUser();
+  const isFirstQueryRef = useRef(true);
 
   const [entries, setEntries] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -24,12 +27,28 @@ export function useChat() {
     if (!query.trim() || isLoading) return;
 
     const token = await getToken();
+    const shouldShowFirstBootHint = isFirstQueryRef.current;
+    let bootHintTimer = null;
+    let hasReceivedServerEvent = false;
     let collectedTrace = [];
     setIsLoading(true);
     setStreamTrace([]);
     setStreamMessage("Checking caches…");
 
+    if (shouldShowFirstBootHint) {
+      bootHintTimer = window.setTimeout(() => {
+        if (!hasReceivedServerEvent) {
+          setStreamMessage(FIRST_REQUEST_BOOT_HINT);
+        }
+      }, FIRST_REQUEST_BOOT_HINT_DELAY_MS);
+    }
+
     function appendTrace(entry) {
+      hasReceivedServerEvent = true;
+      if (bootHintTimer) {
+        window.clearTimeout(bootHintTimer);
+        bootHintTimer = null;
+      }
       collectedTrace = upsertTrace(collectedTrace, entry);
       setStreamTrace([...collectedTrace]);
       setStreamMessage(`${entry.node}: ${entry.detail}`);
@@ -78,6 +97,12 @@ export function useChat() {
         for (const block of blocks) {
           const payload = parseSseBlock(block);
           if (!payload) continue;
+
+          hasReceivedServerEvent = true;
+          if (bootHintTimer) {
+            window.clearTimeout(bootHintTimer);
+            bootHintTimer = null;
+          }
 
           if (payload.type === "status") {
             setStreamMessage(payload.message || "Processing…");
@@ -130,6 +155,10 @@ export function useChat() {
         },
       ]);
     } finally {
+      if (bootHintTimer) {
+        window.clearTimeout(bootHintTimer);
+      }
+      isFirstQueryRef.current = false;
       setStreamMessage("");
       setStreamTrace([]);
       setIsLoading(false);
