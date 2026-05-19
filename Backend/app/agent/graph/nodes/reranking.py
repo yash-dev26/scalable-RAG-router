@@ -1,72 +1,94 @@
-import logging
+# NOTE:
+# Cross-encoder reranking was temporarily disabled for deployment on
+# Render's free tier (512 MB RAM limit).
+#
+# The sentence-transformers / torch inference stack caused the container
+# to exceed available memory during startup/runtime initialization.
+#
+# The adaptive RAG pipeline still functions correctly with:
+# - query planning
+# - query rewriting
+# - retrieval
+# - retrieval evaluation
+# - semantic caching
+# - response caching
+# - streaming generation
+#
+# Reranking can be re-enabled on higher-memory deployments or by using:
+# - lighter reranker models
+# - paid Render instances
 
-from app.schemas.state import GraphState
-from sentence_transformers import CrossEncoder
+# ---
 
-logger = logging.getLogger(__name__)
+# import logging
 
-_reranker_model = None
-_reranker_init_failed = False
+# from app.schemas.state import GraphState
+# from sentence_transformers import CrossEncoder
 
-_RERANKER_MODEL_CANDIDATES = [
-    "cross-encoder/ms-marco-MiniLM-L-6-v2",
-    "BAAI/bge-reranker-base",
-]
+# logger = logging.getLogger(__name__)
 
+# _reranker_model = None
+# _reranker_init_failed = False
 
-def _get_reranker_model():
-    global _reranker_model, _reranker_init_failed
-
-    if _reranker_model is not None:
-        return _reranker_model
-
-    if _reranker_init_failed:
-        return None
-
-    for model_id in _RERANKER_MODEL_CANDIDATES:
-        try:
-            _reranker_model = CrossEncoder(model_id, max_length=512)
-            logger.info("Loaded reranker model: %s", model_id)
-            return _reranker_model
-        except Exception as exc:
-            logger.warning("Failed to load reranker model '%s': %s", model_id, exc)
-
-    _reranker_init_failed = True
-    logger.error("All reranker model candidates failed. Falling back to retrieved order.")
-    return None
+# _RERANKER_MODEL_CANDIDATES = [
+#     "cross-encoder/ms-marco-MiniLM-L-6-v2",
+#     "BAAI/bge-reranker-base",
+# ]
 
 
-def reranking_node(state: GraphState):
-    print("[flow] entering reranking_node")
-    query = state.rewritten_query or state.query
-    docs = state.context or []
+# def _get_reranker_model():
+#     global _reranker_model, _reranker_init_failed
 
-    if not docs:
-        return state
+#     if _reranker_model is not None:
+#         return _reranker_model
 
-    pairs = [(query, doc["text"]) for doc in docs]
+#     if _reranker_init_failed:
+#         return None
 
-    model = _get_reranker_model()
-    if model is None:
-        print("[flow] falling back to retrieved order")
-        return {"context": docs[:4]}
+#     for model_id in _RERANKER_MODEL_CANDIDATES:
+#         try:
+#             _reranker_model = CrossEncoder(model_id, max_length=512)
+#             logger.info("Loaded reranker model: %s", model_id)
+#             return _reranker_model
+#         except Exception as exc:
+#             logger.warning("Failed to load reranker model '%s': %s", model_id, exc)
 
-    scores = model.predict(pairs)
+#     _reranker_init_failed = True
+#     logger.error("All reranker model candidates failed. Falling back to retrieved order.")
+#     return None
 
-    scored_docs = []
 
-    for doc, score in zip(docs, scores):
-        doc["rerank_score"] = float(score)
-        scored_docs.append(doc)
+# def reranking_node(state: GraphState):
+#     print("[flow] entering reranking_node")
+#     query = state.rewritten_query or state.query
+#     docs = state.context or []
 
-    ranked = sorted(
-        scored_docs,
-        key=lambda x: x["rerank_score"],
-        reverse=True
-    )
+#     if not docs:
+#         return state
 
-    top_docs = ranked[:4]
+#     pairs = [(query, doc["text"]) for doc in docs]
 
-    return {
-        "context": top_docs
-    }
+#     model = _get_reranker_model()
+#     if model is None:
+#         print("[flow] falling back to retrieved order")
+#         return {"context": docs[:4]}
+
+#     scores = model.predict(pairs)
+
+#     scored_docs = []
+
+#     for doc, score in zip(docs, scores):
+#         doc["rerank_score"] = float(score)
+#         scored_docs.append(doc)
+
+#     ranked = sorted(
+#         scored_docs,
+#         key=lambda x: x["rerank_score"],
+#         reverse=True
+#     )
+
+#     top_docs = ranked[:4]
+
+#     return {
+#         "context": top_docs
+#     }

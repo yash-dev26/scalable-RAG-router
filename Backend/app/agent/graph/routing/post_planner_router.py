@@ -31,4 +31,5 @@ def route_after_evaluator(state: GraphState) -> str:
     if len(scores) >= 2 and (scores[0] - scores[1] > 0.15):
         return "trim_docs"
 
-    return "do_rerank"
+    # return "do_rerank"
+    return "trim_docs"
