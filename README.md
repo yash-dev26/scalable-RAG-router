@@ -6,7 +6,10 @@ The system uses a multi-provider inference architecture with adaptive routing, s
 
 Unlike traditional “retrieve → generate” pipelines, this project dynamically decides when retrieval is necessary, rewrites ambiguous queries, evaluates retrieval quality, reranks context, and falls back to a pure LLM response when retrieval is not beneficial.
 
-```This project demonstrates production-oriented AI engineering patterns including adaptive retrieval, graph-based orchestration, semantic caching, multi-provider inference routing, and hybrid LLM architectures.```
+> This project demonstrates production-oriented AI engineering patterns including adaptive retrieval, graph-based orchestration, semantic caching, multi-provider inference routing, and hybrid LLM architectures.
+
+
+`NOTE : Reranking (disabled on low-memory deployments)`
 
 ---
 
