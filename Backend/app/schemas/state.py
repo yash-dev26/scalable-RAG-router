@@ -48,3 +48,4 @@ class GraphState(BaseModel):
 
     # Track rewrite attempts to avoid infinite loops
     rewrite_attempts: int = 0
+    attempts: int = 0

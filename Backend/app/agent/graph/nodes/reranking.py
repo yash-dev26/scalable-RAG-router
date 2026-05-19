@@ -9,8 +9,8 @@ _reranker_model = None
 _reranker_init_failed = False
 
 _RERANKER_MODEL_CANDIDATES = [
-    "BAAI/bge-reranker-base",
     "cross-encoder/ms-marco-MiniLM-L-6-v2",
+    "BAAI/bge-reranker-base",
 ]
 
 
@@ -48,6 +48,7 @@ def reranking_node(state: GraphState):
 
     model = _get_reranker_model()
     if model is None:
+        print("[flow] falling back to retrieved order")
         return {"context": docs[:4]}
 
     scores = model.predict(pairs)

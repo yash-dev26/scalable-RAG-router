@@ -9,7 +9,7 @@ from app.repository.qdrant import qdrant_client
 from app.config.server import config
 
 
-SIMILARITY_THRESHOLD = 0.82  # tune later
+SIMILARITY_THRESHOLD = 0.72  # tune later
 
 
 def cosine_similarity(a, b):
