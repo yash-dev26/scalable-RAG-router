@@ -1,7 +1,7 @@
 from app.schemas.state import GraphState
-from app.config.openaiConfig import openai_client
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
-
+from app.service.LLMProviders import generate_completion
+from app.config.models import GENERATION_MODEL, GENERATION_PROVIDER
 
 def _to_openai_message(message) -> dict:
     role_map = {"human": "user", "ai": "assistant", "system": "system"}
@@ -25,12 +25,13 @@ def llm_node(state: GraphState):
 
     openai_messages = [_to_openai_message(message) for message in messages]
 
-    response = openai_client.chat.completions.create(
-        model="gpt-4.1-mini",
+    response = generate_completion(
+        provider=GENERATION_PROVIDER,
+        model=GENERATION_MODEL,
         messages=openai_messages
     )
 
-    assistant_text = response.choices[0].message.content
+    assistant_text = response
 
     return {
         "messages": [AIMessage(content=assistant_text)],

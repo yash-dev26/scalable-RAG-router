@@ -12,4 +12,5 @@ config = {
     "clerk_issuer": os.getenv("CLERK_ISSUER"),
     "CORS_ORIGINS": os.getenv("CORS_ORIGINS", "http://localhost:5174,http://localhost:5173,http://localhost:3000"),
     "redis_host": os.getenv("REDIS_HOST", "localhost"),
+    "groq_api_key": os.getenv("GROQ_API_KEY"),
 }

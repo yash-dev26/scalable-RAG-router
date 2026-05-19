@@ -6,7 +6,7 @@ import os
 from app.config.redis import redis_client
 from app.repository.qdrant import store_in_qdrant
 from app.config.server import config
-from app.config.openaiConfig import openai_client
+from app.config.providers import openai_client
 from app.cache.embeddings_cache import _embedding_cache_key
 
 EMBEDDING_MODEL = "text-embedding-3-small"

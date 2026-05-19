@@ -1,5 +1,6 @@
+from app.service.LLMProviders import generate_completion
 from app.schemas.state import GraphState
-from app.config.openaiConfig import openai_client
+from app.config.models import REWRITE_MODEL, REWRITE_PROVIDER
 
 def single_query_rewrite_node(state: GraphState):
     print("[flow] entering single_query_rewrite_node")
@@ -20,16 +21,17 @@ def single_query_rewrite_node(state: GraphState):
     Conversation History:
     {history_block}"""
 
-    response = openai_client.chat.completions.create(
-        model="gpt-4.1-mini",
+    response_text = generate_completion(
+        provider=REWRITE_PROVIDER,
+        model=REWRITE_MODEL,
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": query}
-        ],  
-        temperature=0.3,
-    )   
+            {"role": "user", "content": query},
+        ],
+        temperature=0.5,
+    )
 
-    rewritten_query = response.choices[0].message.content.strip()
+    rewritten_query = response_text.strip()
     return {
         "rewritten_query": rewritten_query,
         "rewrite_type": "single",
