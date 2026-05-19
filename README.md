@@ -1,10 +1,12 @@
 ﻿# Adaptive RAG
 
-A production-oriented Adaptive Retrieval-Augmented Generation (RAG) system built with FastAPI, LangGraph, Qdrant, Redis, and React.
+A production-oriented Adaptive Retrieval-Augmented Generation (RAG) system built with FastAPI, LangGraph, Qdrant, Redis, React, OpenAI, and Groq.
+
+The system uses a multi-provider inference architecture with adaptive routing, semantic caching, retrieval evaluation, query rewriting, reranking, and cost-optimized orchestration.
 
 Unlike traditional “retrieve → generate” pipelines, this project dynamically decides when retrieval is necessary, rewrites ambiguous queries, evaluates retrieval quality, reranks context, and falls back to a pure LLM response when retrieval is not beneficial.
 
-Designed as both a learning project and a portfolio-grade system, it demonstrates practical AI engineering patterns used in modern retrieval systems.
+```This project demonstrates production-oriented AI engineering patterns including adaptive retrieval, graph-based orchestration, semantic caching, multi-provider inference routing, and hybrid LLM architectures.```
 
 ---
 
@@ -21,6 +23,11 @@ This project implements an adaptive RAG pipeline capable of:
 - Document-scoped retrieval
 - Authentication and multi-user isolation
 - Duplicate ingestion detection
+- Multi-provider LLM orchestration
+- Cost-optimized inference routing
+- Provider abstraction layer
+- Configurable model routing
+- LLM fallback handling
 
 The system supports PDF ingestion, semantic search, and conversational querying over uploaded documents.
 
@@ -55,10 +62,10 @@ The system supports PDF ingestion, semantic search, and conversational querying 
                  ▼                                         ▼
       ┌─────────────────────┐                 ┌─────────────────────┐
       │ Embedding Generation│                 │ Query Rewriting     │
-      │ OpenAI Embeddings   │                 │ Evaluation          │
-      └─────────────────────┘                 └─────────────────────┘
-                 │                                         │
-                 ▼                                         ▼
+      │ OpenAI Embeddings   │                 │ Retrieval Eval      │
+      └─────────────────────┘                 │ (Groq Llama 3.3)    │
+                 │                            └─────────────────────┘
+                 ▼                                         │
       ┌─────────────────────┐                 ┌─────────────────────┐
       │      Qdrant         │◄────────────────│ Retrieval           │
       │ Vector Database     │                 │ + Reranking         │
@@ -67,8 +74,22 @@ The system supports PDF ingestion, semantic search, and conversational querying 
                  │                                         ▼
       ┌─────────────────────┐                 ┌─────────────────────┐
       │ Redis Cache Layer   │                 │ Final Generation    │
-      │ Embeddings/Response │                 │ GPT-4.1-mini        │
+      │ Embeddings/Response │                 │ OpenAI GPT-4.1-mini │
       └─────────────────────┘                 └─────────────────────┘
+
+
+                               ┌─────────────────────────┐
+                               │ Provider Abstraction    │
+                               │ Centralized LLM Layer   │
+                               └──────────┬──────────────┘
+                                          │
+                        ┌─────────────────┴─────────────────┐
+                        ▼                                   ▼
+                ┌─────────────────┐               ┌─────────────────┐
+                │     OpenAI      │               │      Groq       │
+                │ Embeddings      │               │ Fast Rewrites   │
+                │ Final Responses │               │ Retrieval Eval  │
+                └─────────────────┘               └─────────────────┘
 ```
 
 ---
@@ -106,6 +127,73 @@ Generate  Rewrite   Fallback
             ▼
       Final Response
 ```
+
+---
+
+# Multi-Provider LLM Architecture
+
+The system uses a provider abstraction layer to support multiple LLM providers while keeping graph nodes provider-agnostic.
+
+## Provider Responsibilities
+
+| Task | Provider |
+|---|---|
+| Query Rewriting | Groq |
+| Retrieval Evaluation | Groq |
+| Final Response Generation | OpenAI |
+| Embeddings | OpenAI |
+
+## Why Multi-Provider?
+
+This architecture improves:
+
+- Cost efficiency
+- Latency
+- Provider flexibility
+- Reliability
+- Vendor portability
+
+Fast orchestration tasks such as rewriting and evaluation are routed through Groq, while higher-quality final answer generation remains on OpenAI.
+
+## Provider Abstraction Layer
+
+All LLM calls are routed through a centralized provider service:
+
+```text
+Graph Nodes
+    ↓
+LLM Provider Layer
+    ↓
+┌───────────────┬───────────────┐
+│    OpenAI     │     Groq      │
+└───────────────┴───────────────┘
+```
+
+This makes the system easily extensible to additional providers such as Anthropic, Gemini, Together AI, or local models.
+
+---
+
+# Cost Optimization Strategy
+
+The system minimizes inference costs through adaptive provider routing.
+
+## Routing Strategy
+
+| Operation | Strategy |
+|---|---|
+| Embeddings | OpenAI |
+| Rewrite Tasks | Groq |
+| Evaluator Tasks | Groq |
+| Final Responses | OpenAI |
+| Reranking | Local Cross Encoder |
+
+## Why This Matters
+
+Query rewriting and evaluation are high-frequency orchestration tasks that benefit more from low latency and low cost than maximum reasoning quality.
+
+Final response generation is routed to OpenAI to maximize answer quality and response consistency.
+
+This hybrid architecture significantly reduces operational costs while maintaining high-quality responses.
 
 ---
 
@@ -380,10 +468,12 @@ Frontend/
 - FastAPI
 - LangGraph
 - OpenAI API
+- Groq API
 - Qdrant
 - Redis
 - MongoDB
 - SentenceTransformers
+- CrossEncoder Reranking
 
 ## Frontend
 
@@ -409,6 +499,9 @@ Frontend/
 - Context reranking
 - User authentication
 - Multi-user support
+- Multi-provider inference
+- Provider abstraction layer
+- Cost-optimized orchestration
 
 ---
 
@@ -502,11 +595,16 @@ npm run dev
 
 ```env
 OPENAI_API_KEY=
+GROQ_API_KEY=
+
 QDRANT_URL=
 QDRANT_API_KEY=
 QDRANT_COLLECTION_NAME=
+
 SEMANTIC_CACHE_COLLECTION_NAME=
+
 MONGODB_URI=
+
 CLERK_PEM_PUBLIC_KEY=
 VITE_CLERK_PUBLISHABLE_KEY=
 ```
